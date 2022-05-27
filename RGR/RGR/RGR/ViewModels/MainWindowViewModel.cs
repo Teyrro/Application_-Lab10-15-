@@ -51,12 +51,13 @@ namespace RGR.ViewModels
                     {
                         string name = row.ItemArray[0].ToString();
                         if (name == "sqlite_sequence") continue;
-                        /*                        SQLiteDataAdapter adapter = new SQLiteDataAdapter(subsql + name, sql_con);
-                                                adapter.Fill(tables, name);*/
-                        SQLiteCommand sqlTab = new SQLiteCommand(subsql + name, sql_con);
+                        SQLiteDataAdapter adapter = new SQLiteDataAdapter(subsql + name, sql_con);
+                        adapter.FillSchema(tables, SchemaType.Source, name);
+                        adapter.Fill(tables, name);
+                        /*SQLiteCommand sqlTab = new SQLiteCommand(subsql + name, sql_con);
                         DataTable table = new DataTable();
                         table.Load(sqlTab.ExecuteReader());
-                        tables.Tables.Add(table);
+                        tables.Tables.Add(table);*/
                     }
                 }
             }
@@ -77,13 +78,13 @@ namespace RGR.ViewModels
         public void DeleteRow()
         {
             tables.Tables[currentTableIndex].Rows[selectRow].Delete();
-            /*tables.Tables[currentTableIndex].Rows.RemoveAt(selectRow);*/
+          /*  tables.Tables[currentTableIndex].Rows.RemoveAt(selectRow);*/
 
         }
 
         public void OnClick()
         {
-            string connectionStr = "Data Source=firstAttempt_NewV.db;Mode=Write";
+            string connectionStr = "Data Source=firstAttempt_NewV.db;Mode=ReadWrite";
 
             using (sql_con = new SQLiteConnection(connectionStr))
             {
@@ -92,10 +93,9 @@ namespace RGR.ViewModels
                     try
                     {
                         SQLiteDataAdapter adapter = new SQLiteDataAdapter("SELECT * FROM " + tables.Tables[i].TableName, sql_con);
-                       
+
                         SQLiteCommandBuilder commandBuilder = new SQLiteCommandBuilder(adapter);
                         adapter.Update(tables.Tables[i]);
-                        tables.AcceptChanges();
 
                     }
                     catch (SqlException ex)
@@ -104,6 +104,7 @@ namespace RGR.ViewModels
                     }
 
                 }
+                        tables.AcceptChanges();
             }
         }
         ~MainWindowViewModel()
