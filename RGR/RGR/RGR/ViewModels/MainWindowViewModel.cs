@@ -1,116 +1,63 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
-using System.Data.SQLite;
-using System.Data;
+using System.Threading.Tasks;
 using ReactiveUI;
-using System.Collections.ObjectModel;
-using System.Data.SqlClient;
-using System.Diagnostics;
 
 namespace RGR.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        private SQLiteConnection sql_con;
-        private DataSet tables;
-        int selectRow;
+        ViewModelBase currentView;
 
-        public int currentTableIndex;
-
-
-        
-        public int SelectRow
+        public ViewModelBase CurrentView
         {
-            get => selectRow;
-            private set => this.RaiseAndSetIfChanged(ref selectRow, value);
+            set => this.RaiseAndSetIfChanged(ref currentView, value);
+            get => currentView;
         }
 
-        public DataSet Tables
+        private float minWidth, maxWidth, width;
+        public float MinWidth { get => minWidth; set => this.RaiseAndSetIfChanged(ref minWidth, value); }
+        public float MaxWidth { get => maxWidth; set => this.RaiseAndSetIfChanged(ref maxWidth, value); }
+        public float Width { get => width; set => this.RaiseAndSetIfChanged(ref width, value); }
+
+        public TableViewModel mainView
         {
-            get => tables;
-            private set => this.RaiseAndSetIfChanged(ref tables, value);
+            get;
         }
+
+        public void Change()
+        {
+            if (CurrentView is TableViewModel)
+            {
+                var vm = new RequestManagerViewModel(mainView.Tables, mainView.Requests);
+                Observable.Merge(vm.Send).Take(1).Subscribe(msg =>
+                {
+                    if (msg != null)
+                    {
+                        mainView.Requests = msg;
+                    }
+                    CurrentView = mainView;
+                });
+                CurrentView = vm;
+                Width = 600;
+                MinWidth = 600;
+            }
+            else if (currentView is RequestManagerViewModel) {
+                CurrentView = new TableViewModel();
+                Width = 800;
+                MinWidth = 450;
+            } 
+        }
+
         public MainWindowViewModel()
         {
-            string sql = "SELECT name FROM sqlite_master WHERE type=\"table\" ORDER BY 1";
-            string connectionStr = "Data Source=firstAttempt_NewV.db;Mode=ReadWrite";
-            
-            using (sql_con = new SQLiteConnection(connectionStr))
-            {
-                sql_con.Open();
-                SQLiteCommand command = new SQLiteCommand(sql, sql_con);
-                DataTable tablesNames = new DataTable();
-                using (SQLiteDataReader reader = command.ExecuteReader())
-                {
-                
-                    tablesNames.Load(reader);
-                    tables = new DataSet();
-                    string subsql = "SELECT * FROM ";
-                    foreach (DataRow row in tablesNames.Rows)
-                    {
-                        string name = row.ItemArray[0].ToString();
-                        if (name == "sqlite_sequence") continue;
-                        SQLiteDataAdapter adapter = new SQLiteDataAdapter(subsql + name, sql_con);
-                        adapter.FillSchema(tables, SchemaType.Source, name);
-                        adapter.Fill(tables, name);
-                        /*SQLiteCommand sqlTab = new SQLiteCommand(subsql + name, sql_con);
-                        DataTable table = new DataTable();
-                        table.Load(sqlTab.ExecuteReader());
-                        tables.Tables.Add(table);*/
-                    }
-                }
-            }
+            CurrentView = mainView = new TableViewModel();
+            Width = 800;
+            MinWidth = 450;
+            MaxWidth = 800;
         }
-
-
-        public void AddRow()
-        {
-            DataRow row = tables.Tables[currentTableIndex].NewRow();
-
-            for (int i = 1; i < row.ItemArray.Length ; i++)
-            {
-                row.ItemArray[i] = '1';
-            }
-            tables.Tables[currentTableIndex].Rows.Add(row);
-        }
-
-        public void DeleteRow()
-        {
-            tables.Tables[currentTableIndex].Rows[selectRow].Delete();
-          /*  tables.Tables[currentTableIndex].Rows.RemoveAt(selectRow);*/
-
-        }
-
-        public void OnClick()
-        {
-            string connectionStr = "Data Source=firstAttempt_NewV.db;Mode=ReadWrite";
-
-            using (sql_con = new SQLiteConnection(connectionStr))
-            {
-                for (int i = 0; i < tables.Tables.Count; i++){
-                
-                    try
-                    {
-                        SQLiteDataAdapter adapter = new SQLiteDataAdapter("SELECT * FROM " + tables.Tables[i].TableName, sql_con);
-
-                        SQLiteCommandBuilder commandBuilder = new SQLiteCommandBuilder(adapter);
-                        adapter.Update(tables.Tables[i]);
-
-                    }
-                    catch (SqlException ex)
-                    {
-                        Debug.WriteLine(ex.Message);
-                    }
-
-                }
-                        tables.AcceptChanges();
-            }
-        }
-        ~MainWindowViewModel()
-        {
-            sql_con.Close();
-        }
-
     }
 }

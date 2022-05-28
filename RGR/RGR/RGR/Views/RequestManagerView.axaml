@@ -1,0 +1,202 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="800"
+             x:Class="RGR.Views.RequestManagerView">
+	<ScrollViewer>
+		<Grid ColumnDefinitions="Auto, *">
+
+			<Grid ColumnDefinitions="*" RowDefinitions="Auto, Auto, Auto, *" Margin="10">
+
+				<Button Margin="0, 0, 0, 5" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Content="Add Request"/>
+				<Button Grid.Row="1" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Content="Exit" Command="{Binding $parent[Window].DataContext.Change}"/>
+				<TextBlock Grid.Row="2" Text="Requests:" Margin="0, 5"/>
+				<ListBox Grid.Row="3" Items="{Binding Requests}" SelectedIndex="{Binding SelectedRequestIndex}">
+					<ListBox.ItemTemplate>
+						<DataTemplate>
+							<TextBlock Text="{Binding Name}"/>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+
+			</Grid>
+
+			<Grid Grid.Column="1" ColumnDefinitions="Auto" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto">
+
+				<TextBlock Margin="0, 10, 0, 0" Text="Name"/>
+				<TextBox Grid.Row="1" Width="200" HorizontalAlignment="Left" Text="{Binding  Requests[SelectedRequestIndex].Name}"/>
+
+				<Grid Grid.Row="2" RowDefinitions="Auto, Auto, Auto, Auto" ColumnDefinitions="200, 200">
+
+					<TextBlock Text="FROM" Margin="0, 10, 0, 0"/>
+					<Border Grid.Row="1" BorderThickness="1" BorderBrush="#999999" Height="140" CornerRadius="4">
+						<ScrollViewer VerticalScrollBarVisibility="Hidden">
+							<ItemsControl  Items="{Binding TableNameCollection}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate>
+										<Grid RowDefinitions="Auto" ColumnDefinitions="*, Auto">
+											<TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center" Text="{Binding Text}"/>
+											<CheckBox Grid.Column="1" IsChecked="{Binding IsUsed}" Click="OnCheckBoxTableClick"/>
+										</Grid>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</ScrollViewer>
+					</Border>
+
+					<TextBlock Margin="20, 10, 0 ,0" Grid.Column="1" Text="SELECT"/>
+					<Border Grid.Row="1" Grid.Column="2"  BorderThickness="1" Margin="20, 0, 0 ,0" BorderBrush="#999999" Width="200" Height="140" CornerRadius="4">
+						<ScrollViewer VerticalScrollBarVisibility="Hidden">
+							<ItemsControl  Items="{Binding ColumnNameCollection}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate>
+										<Grid RowDefinitions="Auto" ColumnDefinitions="*, Auto">
+											<TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center" Text="{Binding Text}"/>
+											<CheckBox Grid.Column="1" IsChecked="{Binding IsUsed}" Click="OnCheckBoxColumnClick"/>
+										</Grid>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</ScrollViewer>
+					</Border>
+					
+					<TextBlock Text="FUNC" Grid.Row="2" Margin="0, 10, 0, 0"/>
+					<Border Grid.Row="3" BorderThickness="1" BorderBrush="#999999" Height="140" CornerRadius="4">
+						<ScrollViewer VerticalScrollBarVisibility="Hidden">
+							<ItemsControl  Items="{Binding SelectedColumnNameCollection}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate>
+										<Grid RowDefinitions="Auto" ColumnDefinitions="*, Auto">
+											<TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center" Text="{Binding Text}"/>
+											<ComboBox Grid.Column="1" SelectedIndex="{Binding IsUsed}" SelectingItemsControl.IsSelectedChanged="OnComboBoxSelectedClick">
+												<ComboBoxItem Content="none"/>
+												<ComboBoxItem Content="AVG"/>
+												<ComboBoxItem Content="SUM"/>
+												<ComboBoxItem Content="MIN"/>
+												<ComboBoxItem Content="MAX"/>
+												<ComboBoxItem Content="COUNT"/>
+											</ComboBox>
+										</Grid>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</ScrollViewer>
+					</Border>
+
+					<TextBlock Text="GROUP BY" Grid.Column="1" Grid.Row="2" Margin="20, 10, 0, 0"/>
+					<Border Grid.Row="3" Grid.Column="1" BorderThickness="1" Margin="20, 0, 0 ,0" BorderBrush="#999999" Height="140" CornerRadius="4">
+						<ScrollViewer VerticalScrollBarVisibility="Hidden">
+							<ItemsControl  Items="{Binding GroupByColumnNameCollection}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate>
+										<Grid RowDefinitions="Auto" ColumnDefinitions="*, Auto">
+											<TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center" Text="{Binding Text}"/>
+											<CheckBox Grid.Column="1" IsChecked="{Binding IsUsed}"/>
+										</Grid>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</ScrollViewer>
+					</Border>
+
+				</Grid>
+
+				<TextBlock Text="WHERE" Margin="0, 10, 0, 0" Grid.Row="3"/>
+
+				<WrapPanel Grid.Row="4">
+
+					<ComboBox Width="170" Items="{Binding ColumnNameCollection}" SelectedIndex="{Binding SelectedWhereIndex}">
+						<ComboBox.ItemTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding Text}"/>
+							</DataTemplate>
+						</ComboBox.ItemTemplate>
+					</ComboBox>
+
+					<ComboBox Margin="10, 0, 0, 0" Width="64" HorizontalContentAlignment="Center" SelectedIndex="{Binding SelectedWhereSymbolIndex}" Items="{Binding Symbols}"/>
+
+					<TextBox Margin="10, 0, 0, 0" Width="90" Text="{Binding WhereCondition}"/>
+
+					<ComboBox Margin="10, 0, 0, 0" Width="69" HorizontalContentAlignment="Center" SelectedIndex="0" SelectionChanged="OnComboBoxWhereClick">
+						<ComboBoxItem Content=" "/>
+						<ComboBoxItem Content="AND"/>
+						<ComboBoxItem Content="OR"/>
+					</ComboBox>
+
+				</WrapPanel>
+
+				<TextBlock Text="HAVING" Margin="0, 10, 0, 0" Grid.Row="5"/>
+
+				<WrapPanel Grid.Row="6">
+
+					<ComboBox Width="170" Items="{Binding ColumnNameCollection}" SelectedIndex="{Binding SelectedHavingIndex}">
+						<ComboBox.ItemTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding Text}"/>
+							</DataTemplate>
+						</ComboBox.ItemTemplate>
+					</ComboBox>
+
+					<ComboBox Margin="10, 0, 0, 0" Width="64" HorizontalContentAlignment="Center" SelectedIndex="{ Binding SelectedHavingSymbolIndex}" Items="{Binding Symbols}"/>
+
+					<TextBox Margin="10, 0, 0, 0" Width="90" Text="{Binding HavingCondition}" />
+
+					<ComboBox Margin="10, 0, 0, 0" Width="69" HorizontalContentAlignment="Center" SelectedIndex="0" SelectionChanged="OnComboBoxHavingClick">
+						<ComboBoxItem Content=" "/>
+						<ComboBoxItem Content="AND"/>
+						<ComboBoxItem Content="OR"/>
+					</ComboBox>
+
+				</WrapPanel>
+				
+					
+				<Grid Grid.Row="8" ColumnDefinitions="Auto, Auto, Auto, Auto, Auto" RowDefinitions="Auto, Auto">
+					
+					<TextBlock Text="JOIN" Margin="0, 10, 0, 0"/>
+					
+					<ComboBox Items="{Binding JoinTableNameCollection}" Grid.Row="1" SelectionChanged="OnComboBoxTableSelectionChanged">
+						<ComboBox.ItemTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding Text}"/>
+							</DataTemplate>
+						</ComboBox.ItemTemplate>
+					</ComboBox>
+					
+					<TextBlock Text="ON" VerticalAlignment="Center" Margin="10, 0" Grid.Row="1" Grid.Column="1"/>
+					
+					<TextBlock Text="COL 1" HorizontalAlignment="Center" Grid.Column="2" Margin="0, 10, 0, 0"/>
+					
+					<ComboBox Items="{Binding ColumnNameCollection}" Grid.Row="1" Grid.Column="2" SelectedIndex="{Binding SelectedJoinColumn1Index}" >
+						<ComboBox.ItemTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding Text}"/>
+							</DataTemplate>
+						</ComboBox.ItemTemplate>
+					</ComboBox>
+					
+					<TextBlock Text="COL 2" HorizontalAlignment="Center" Grid.Column="3" Margin="0, 10, 0, 0"/>
+					
+					<ComboBox Margin="10, 0, 0, 0" Grid.Row="1" SelectedIndex="{Binding SelectedJoinColumn2Index}" Grid.Column="3" Items="{Binding JoinColumnNameCollection}">
+						<ComboBox.ItemTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding Text}"/>
+							</DataTemplate>
+						</ComboBox.ItemTemplate>
+					</ComboBox>
+					<Button Grid.Column="4" Grid.Row="1" Content="Add" VerticalAlignment="Center" Margin="10, 0, 0, 0" Click="OnJoinClick"/>
+				</Grid>
+				
+				<TextBox Text="{Binding Request}" Grid.Row="9" Margin="0, 10, 0, 0" Height="160"/>
+				
+				<WrapPanel Grid.Row="10" Margin="0, 10, 0, 0">
+					<Button Content="Create Request" Click="OnExecuteClick" />
+					<Button Margin="10, 0, 0, 0" Content="Clear" Command="{Binding ClearRequest}"/>
+					<Button Margin="10, 0, 0, 0" Content="Send" Command="{Binding Send}"/>
+				</WrapPanel>
+				
+			</Grid>
+
+		</Grid>
+	</ScrollViewer>
+</UserControl>

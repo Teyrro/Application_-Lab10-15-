@@ -7,38 +7,17 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="RGR.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Title="RGR">
+        Title="RGR"
+		Content="{Binding CurrentView}"
+		MinWidth="{Binding MinWidth}"
+		MaxWidth="{Binding MaxWidth}"
+		Width="{Binding Width}">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto, Auto, Auto, *">
-        <Menu>
-	        <MenuItem Header="File"/>
-	        <MenuItem Header="New Request"/>
-        </Menu>
-        <TabControl Grid.Row="1" Items="{Binding Tables.Tables}" SelectionChanged="OnSelect" >
-            <TabControl.ItemTemplate>
-            <DataTemplate>
-                <TextBlock Text="{Binding TableName}" />
-            </DataTemplate>
-            </TabControl.ItemTemplate>
-        </TabControl>
-        <Grid Grid.Row="2" Margin="0, 5, 0, 0" ColumnDefinitions="Auto, Auto, Auto, Auto" RowDefinitions="Auto">
-	        <Button Margin="10, 0, 0, 0" Content="Save" Command="{Binding OnClick}"/>
-	        <Button Margin="10, 0, 0, 0" Grid.Column="1" Content="AddRow" Click="OnAddRowButtonClick"/>
-			<Button Margin="10, 0, 0, 0" Grid.Column="2" Content="Delete" Click="OnDelRowButtonClick"/>
-        </Grid>
-        <DataGrid 
-			SelectedIndex="{Binding SelectRow}"
-			Margin="0, 5, 0, 0"
-			Grid.Row="3" 
-	        x:Name="dGrid" 
-	        AutoGenerateColumns="False" 
-	        VerticalScrollBarVisibility="Visible" 
-	        IsReadOnly="False"
-	        >
-        </DataGrid>
-    </Grid>
+	
+
+
 </Window>
