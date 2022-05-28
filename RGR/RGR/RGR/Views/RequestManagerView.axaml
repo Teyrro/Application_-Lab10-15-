@@ -69,7 +69,7 @@
 									<DataTemplate>
 										<Grid RowDefinitions="Auto" ColumnDefinitions="*, Auto">
 											<TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center" Text="{Binding Text}"/>
-											<ComboBox Grid.Column="1" SelectedIndex="{Binding IsUsed}" SelectingItemsControl.IsSelectedChanged="OnComboBoxSelectedClick">
+											<ComboBox Grid.Column="1" SelectedIndex="{Binding IsUsed}" SelectionChanged="OnComboBoxSelectedClick">
 												<ComboBoxItem Content="none"/>
 												<ComboBoxItem Content="AVG"/>
 												<ComboBoxItem Content="SUM"/>
